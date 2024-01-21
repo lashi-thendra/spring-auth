@@ -44,6 +44,10 @@ public class JwtAuthFilter
                 UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }else{
+                response.getWriter().write("Token is not valid");
+                response.setStatus(401);
+                return;
             }
         }
         filterChain.doFilter(request, response);

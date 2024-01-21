@@ -5,7 +5,6 @@ import lk.srilanka.Auth.entity.UserInfo;
 import lk.srilanka.Auth.service.JwtService;
 import lk.srilanka.Auth.service.UserInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -14,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
-public class UserController {
+public class AuthController {
 
     @Autowired
     private UserInfoService service;
@@ -25,35 +24,20 @@ public class UserController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
-    @GetMapping("/welcome")
-    public String welcome() {
-        return "Welcome this endpoint is not secure";
-    }
-
-    @PostMapping("/addNewUser")
+    @PostMapping("/register")
     public String addNewUser(@RequestBody UserInfo userInfo) {
         return service.addUser(userInfo);
     }
 
-    @GetMapping("/user/userProfile")
-//    @PreAuthorize("hasAuthority('ROLE_USER')")
-    public String userProfile() {
-        return "Welcome to User Profile";
-    }
 
-    @GetMapping("/admin/adminProfile")
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    public String adminProfile() {
-        return "Welcome to Admin Profile";
-    }
-
-    @PostMapping("/generateToken")
+    @PostMapping("/login")
     public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
         //
         if (authentication.isAuthenticated()) {
+            // Todo: currently the role is hardcoded as "ROLE_ADMIN"
             //Todo: find the role of the user (from the database) and pass to the generateToken( - , )
-            return jwtService.generateToken(authRequest.getUsername(), "ADMIN");
+            return jwtService.generateToken(authRequest.getUsername(), "ROLE_ADMIN");
         } else {
             throw new UsernameNotFoundException("invalid user request !");
         }
